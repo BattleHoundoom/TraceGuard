@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import AppSidebar from "@/components/layout/AppSidebar";
 import ReportPanel from "@/components/report/ReportPanel";
-import { getReport, exportReport, markAllReviewed, type ReportSummary } from "@/lib/api";
+import { getReport, markAllReviewed, type ReportSummary } from "@/lib/api";
+import { exportReportAsPdf } from "@/lib/exportPdf";
 
 export default function ReportPage() {
   const params = useParams();
@@ -20,11 +21,10 @@ export default function ReportPage() {
   }, [scanId]);
 
   const handleExport = async () => {
+    if (!report) return;
     setIsExporting(true);
     try {
-      // TODO: wire to real download flow
-      const { downloadUrl } = await exportReport(scanId);
-      console.log("Export ready:", downloadUrl);
+      await exportReportAsPdf(report);
     } finally {
       setIsExporting(false);
     }
@@ -95,11 +95,11 @@ export default function ReportPage() {
           <div className="flex gap-3">
             <button
               onClick={handleExport}
-              disabled={isExporting}
+              disabled={isExporting || !report}
               className="bg-[#32353c] text-[#ffd597] px-4 py-2 text-[10px] font-bold tracking-widest uppercase hover:bg-[#363940] flex items-center gap-2 border border-[#524533] disabled:opacity-60"
             >
               <span className="material-symbols-outlined text-sm">download</span>
-              {isExporting ? "EXPORTING..." : "EXPORT REPORT"}
+              {isExporting ? "GENERATING PDF..." : "EXPORT PDF"}
             </button>
             <button
               onClick={handleMarkAllReviewed}

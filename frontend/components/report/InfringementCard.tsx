@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { draftCeaseAndDesist, getFullTrace, type Infringement } from "@/lib/api";
+import type { Infringement } from "@/lib/api";
 
 interface InfringementCardProps {
   item: Infringement;
@@ -31,17 +31,17 @@ const SEVERITY_STYLES: Record<
 export default function InfringementCard({ item }: InfringementCardProps) {
   const style = SEVERITY_STYLES[item.severity];
 
-  const handleCeaseAndDesist = async () => {
-    // TODO: wire to real backend
-    const { documentId } = await draftCeaseAndDesist(item.id);
-    console.log("C&D draft created:", documentId);
-  };
+  const ceaseAndDesistHref = (() => {
+    const subject = encodeURIComponent(
+      `Cease and Desist Notice – Intellectual Property Infringement by ${item.domain}`
+    );
+    const body = encodeURIComponent(
+      `Dear Sir/Madam,\n\nIt has come to our attention that ${item.domain} is engaged in activity that constitutes infringement of our intellectual property rights. Our systems have identified a ${item.matchPercent}% similarity match with our protected assets (${item.tags.join(", ")}).\n\nWe hereby demand that you immediately cease and desist from any further use of our trademarks, brand identity, or related intellectual property. This includes, but is not limited to, the unauthorized use of our brand name, logo, product imagery, or any confusingly similar marks.\n\nFailure to comply within 14 days of receipt of this notice may result in legal action, including injunctive relief and claims for damages.\n\nPlease respond in writing to confirm your compliance.\n\nRegards,\n[Your Name]\n[Your Organization]\n[Contact Information]`
+    );
+    return `mailto:?subject=${subject}&body=${body}`;
+  })();
 
-  const handleViewTrace = async () => {
-    // TODO: navigate to trace page
-    const { traceUrl } = await getFullTrace(item.id);
-    console.log("Opening trace:", traceUrl);
-  };
+  const sourceHref = `https://${item.domain}`;
 
   return (
     <article className={`bg-[#1d2026] group relative ${style.border}`}>
@@ -102,18 +102,20 @@ export default function InfringementCard({ item }: InfringementCardProps) {
 
           {/* Actions */}
           <div className="flex gap-2">
-            <button
-              onClick={handleCeaseAndDesist}
-              className="flex-1 bg-[#ffb000] text-[#432c00] text-[9px] font-bold py-2 tracking-widest uppercase hover:brightness-110 transition"
+            <a
+              href={ceaseAndDesistHref}
+              className="flex-1 bg-[#ffb000] text-[#432c00] text-[9px] font-bold py-2 tracking-widest uppercase hover:brightness-110 transition text-center"
             >
               DRAFT CEASE &amp; DESIST
-            </button>
-            <button
-              onClick={handleViewTrace}
-              className="flex-1 border border-[#524533] text-[#d7c4ac] text-[9px] font-bold py-2 tracking-widest uppercase hover:bg-[#32353c] transition"
+            </a>
+            <a
+              href={sourceHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 border border-[#524533] text-[#d7c4ac] text-[9px] font-bold py-2 tracking-widest uppercase hover:bg-[#32353c] transition text-center"
             >
-              VIEW FULL TRACE
-            </button>
+              VIEW SOURCE
+            </a>
           </div>
         </div>
       </div>

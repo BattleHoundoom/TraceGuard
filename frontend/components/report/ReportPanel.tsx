@@ -14,7 +14,6 @@ interface ReportPanelProps {
 const DEFAULT_FILTERS: ReportFilters = {
   severity: ["CRITICAL", "MODERATE"],
   sourceType: ["DOMAIN_SQUATTING", "SOCIAL_MEDIA", "E_COMMERCE"],
-  status: "UNACTIONED",
 };
 
 export default function ReportPanel({ infringements }: ReportPanelProps) {

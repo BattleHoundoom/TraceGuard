@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import type { Severity, SourceType, InfringementStatus } from "@/lib/api";
+import type { Severity, SourceType } from "@/lib/api";
 
 export interface ReportFilters {
   severity: Severity[];
   sourceType: SourceType[];
-  status: InfringementStatus;
 }
 
 interface ReportFilterSidebarProps {
@@ -27,12 +26,6 @@ const SOURCE_TYPES: { id: SourceType; label: string }[] = [
   { id: "NFT_CRYPTO", label: "NFT/CRYPTO" },
 ];
 
-const STATUSES: { value: InfringementStatus; label: string }[] = [
-  { value: "UNACTIONED", label: "UNACTIONED" },
-  { value: "PENDING_REVIEW", label: "PENDING REVIEW" },
-  { value: "CEASE_AND_DESIST_SENT", label: "CEASE & DESIST SENT" },
-  { value: "LITIGATION", label: "LITIGATION" },
-];
 
 export default function ReportFilterSidebar({
   filters,
@@ -104,28 +97,6 @@ export default function ReportFilterSidebar({
         </div>
       </div>
 
-      {/* Status */}
-      <div>
-        <h3 className="font-label text-[10px] font-bold uppercase tracking-widest text-[#ffb000] mb-4">
-          STATUS
-        </h3>
-        <select
-          value={filters.status}
-          onChange={(e) =>
-            onChange({
-              ...filters,
-              status: e.target.value as InfringementStatus,
-            })
-          }
-          className="w-full bg-[#191c22] border border-[#524533] text-[#d7c4ac] text-xs py-2 px-3 rounded-none outline-none focus:border-[#ffb000]"
-        >
-          {STATUSES.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-      </div>
     </aside>
   );
 }

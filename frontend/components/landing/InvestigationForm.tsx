@@ -110,7 +110,7 @@ export default function InvestigationForm() {
                   value={assetName}
                   onChange={(e) => setAssetName(e.target.value)}
                   placeholder="e.g. TRACEGUARD CORE"
-                  className="w-full bg-surface-container-low border-0 border-b border-[#524533]/30 text-on-surface focus:outline-none focus:border-primary tabular-data py-3 transition-all placeholder:text-outline/50"
+                  className="w-full bg-surface-container-low border-0 border-b border-[#524533]/30 text-on-surface focus:outline-none focus:border-primary tabular-data px-3 py-3 transition-all placeholder:text-outline/50"
                 />
               </div>
               <div className="space-y-2">
@@ -122,7 +122,7 @@ export default function InvestigationForm() {
                   value={primaryUrl}
                   onChange={(e) => setPrimaryUrl(e.target.value)}
                   placeholder="https://..."
-                  className="w-full bg-surface-container-low border-0 border-b border-[#524533]/30 text-on-surface focus:outline-none focus:border-primary tabular-data py-3 transition-all placeholder:text-outline/50"
+                  className="w-full bg-surface-container-low border-0 border-b border-[#524533]/30 text-on-surface focus:outline-none focus:border-primary tabular-data px-3 py-3 transition-all placeholder:text-outline/50"
                 />
               </div>
             </div>
@@ -137,7 +137,7 @@ export default function InvestigationForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full bg-surface-container-low border-0 border-b border-[#524533]/30 text-on-surface focus:outline-none focus:border-primary tabular-data py-3 transition-all placeholder:text-outline/50"
+                className="w-full bg-surface-container-low border-0 border-b border-[#524533]/30 text-on-surface focus:outline-none focus:border-primary tabular-data px-3 py-3 transition-all placeholder:text-outline/50"
               />
             </div>
 

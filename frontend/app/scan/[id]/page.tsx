@@ -1,4 +1,8 @@
-import { getScan } from "@/lib/api";
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "next/navigation";
+import { getScan, type ScanStatus } from "@/lib/api";
 import AppSidebar from "@/components/layout/AppSidebar";
 import AppTopNav from "@/components/layout/AppTopNav";
 import TerminalLog from "@/components/scan/TerminalLog";
@@ -6,13 +10,80 @@ import ScanSidePanel from "@/components/scan/ScanSidePanel";
 import DataStream from "@/components/scan/DataStream";
 import Link from "next/link";
 
-interface ScanPageProps {
-  params: { id: string };
-}
+const POLL_INTERVAL_MS = 3_000;
 
-export default async function ScanPage({ params }: ScanPageProps) {
-  // TODO: When backend is ready, getScan() will fetch from /api/scans/:id
-  const scan = await getScan(params.id);
+export default function ScanPage() {
+  const { id } = useParams<{ id: string }>();
+  const [scan, setScan] = useState<ScanStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchScan = useCallback(async () => {
+    try {
+      const data = await getScan(id);
+      setScan(data);
+      setError(null);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      // 404 means the scan is still being initialised — not a fatal error
+      if (msg.includes("404")) {
+        setScan(null);
+        setError(null);
+      } else {
+        setError(msg);
+      }
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchScan();
+  }, [fetchScan]);
+
+  useEffect(() => {
+    if (scan?.status === "complete") return; // Stop polling when done
+    const timer = setInterval(fetchScan, POLL_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [scan?.status, fetchScan]);
+
+  // ── Loading / initialising state ─────────────────────────────────────────
+
+  if (error) {
+    return (
+      <>
+        <AppSidebar />
+        <AppTopNav />
+        <main className="ml-64 mt-[60px] p-6 min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <span className="material-symbols-outlined text-4xl text-secondary">error</span>
+            <p className="font-headline text-sm text-secondary tracking-widest uppercase">Scan Error</p>
+            <p className="font-mono text-xs text-on-surface-variant">{error}</p>
+            <Link href="/">
+              <button className="mt-4 px-6 py-3 bg-primary-container text-on-primary font-headline text-xs font-bold tracking-widest uppercase">
+                New Investigation
+              </button>
+            </Link>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  if (!scan) {
+    return (
+      <>
+        <AppSidebar />
+        <AppTopNav />
+        <main className="ml-64 mt-[60px] p-6 min-h-screen flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <span className="material-symbols-outlined text-4xl text-primary animate-spin">sync</span>
+            <p className="font-headline text-sm text-primary tracking-widest uppercase">Initialising Investigation…</p>
+            <p className="font-mono text-xs text-on-surface-variant opacity-50">Scan ID: {id}</p>
+          </div>
+        </main>
+      </>
+    );
+  }
+
+  // ── Main scan dashboard ───────────────────────────────────────────────────
 
   return (
     <>
@@ -37,7 +108,7 @@ export default async function ScanPage({ params }: ScanPageProps) {
             <div className="text-right">
               <div className="flex items-center justify-end gap-2 mb-1">
                 <span className="text-[10px] font-headline text-on-surface-variant tracking-widest">
-                  SCAN PROGRESS
+                  {scan.status === "complete" ? "SCAN COMPLETE" : "SCAN PROGRESS"}
                 </span>
                 <span className="text-lg font-headline font-bold text-primary">
                   {scan.progressPercent}%
@@ -45,22 +116,19 @@ export default async function ScanPage({ params }: ScanPageProps) {
               </div>
               <div className="w-64 h-1 bg-surface-container-highest relative overflow-hidden">
                 <div
-                  className="absolute top-0 left-0 h-full bg-primary-container"
+                  className="absolute top-0 left-0 h-full bg-primary-container transition-all duration-500"
                   style={{ width: `${scan.progressPercent}%` }}
                 />
                 <div
-                  className="absolute top-0 left-0 h-full bg-primary opacity-50 blur-sm"
+                  className="absolute top-0 left-0 h-full bg-primary opacity-50 blur-sm transition-all duration-500"
                   style={{ width: `${scan.progressPercent * 0.4}%` }}
                 />
               </div>
             </div>
 
-            {/* View report CTA - only shown when done or partially done */}
             <Link href={`/report/${scan.id}`}>
               <button className="bg-primary-container text-on-primary text-[10px] font-headline font-bold px-4 py-3 tracking-widest uppercase hover:brightness-110 transition flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm">
-                  assignment
-                </span>
+                <span className="material-symbols-outlined text-sm">assignment</span>
                 VIEW REPORT
               </button>
             </Link>

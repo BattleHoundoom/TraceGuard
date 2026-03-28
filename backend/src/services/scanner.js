@@ -88,40 +88,51 @@ function elapsedMs() {
 // ── Goal builder ──────────────────────────────────────────────────────────────
 
 function buildScrapeGoal(assetType, assetName, analysis) {
-  return `You are an IP infringement detection agent. Investigate this website thoroughly for any products, content, or services that may potentially infringe upon the following intellectual property asset.
+  return `You are an aggressive IP infringement detection agent working on behalf of the rights holder. Your job is to FIND potential infringement — not to clear sites of suspicion.
 
-ASSET TYPE: ${assetType.toUpperCase()}
-ASSET NAME: ${assetName}
-DESCRIPTION: ${analysis.description}
-KEY FEATURES/CLAIMS: ${analysis.keyFeatures.join("; ")}
-SEARCH KEYWORDS: ${analysis.keywords.join(", ")}
+PROTECTED ASSET
+  Type:     ${assetType.toUpperCase()}
+  Name:     ${assetName}
+  Summary:  ${analysis.description}
+  Key features / claims:
+    ${analysis.keyFeatures.map((f, i) => `${i + 1}. ${f}`).join("\n    ")}
+  Search keywords: ${analysis.keywords.join(", ")}
 
-Instructions:
-1. Navigate the website and search for the keywords above.
-2. Examine product listings, search result pages, and any content that matches the asset description.
-3. For each potential infringement, assess the similarity to the original asset.
-4. Be objective — only flag items with genuine similarity, not superficial keyword matches.
+MANDATORY STEPS — complete ALL of them before returning results:
+1. Use the site's own search bar (or search URL) to search for EACH of these terms separately: ${analysis.keywords.slice(0, 5).join(", ")}.
+2. For every search, scroll through at least the first two pages of results.
+3. Open any listing that looks remotely related to the asset and inspect it in detail.
+4. Also browse the most relevant category pages (e.g. for e-commerce: matching product categories; for social media: profiles or posts using the asset name).
+
+DETECTION RULES — flag a match if ANY of the following apply:
+- The product/content replicates one or more key features listed above, even partially.
+- The name, branding, or description is confusingly similar to "${assetName}".
+- The functionality, design, or creative output substantially overlaps with the asset's description.
+- The item is clearly a copy, counterfeit, or derivative work.
+- The item implements the same technical approach described in the key features.
+DO NOT require all features to match — a single meaningful feature overlap is enough to flag at LOW or MEDIUM.
 
 Return your findings as a JSON object with ONLY this structure (no markdown, no surrounding text):
 {
   "matches": [
     {
-      "link": "direct URL to the specific infringing product or content page",
-      "product_title": "name of the product, page, or content found",
-      "reason": "a specific, factual explanation of how and why this potentially infringes on the asset",
-      "matched_features": ["specific feature or claim that is replicated", "another matched element"],
+      "link": "direct URL to the specific infringing product, listing, or content page",
+      "product_title": "exact name of the product, listing, or content",
+      "reason": "cite which specific key feature(s) from the list above are replicated and how",
+      "matched_features": ["exact feature from the list that is matched", "another matched feature"],
       "risk_level": "HIGH",
       "similarity_score": "HIGH"
     }
   ]
 }
 
-For risk_level / similarity_score use:
-  HIGH   — direct, clear infringement of a core feature or identical reproduction
-  MEDIUM — likely infringement with some functional or visual differences
-  LOW    — possible or partial infringement worth monitoring
+risk_level / similarity_score values:
+  HIGH   — replicates a core feature directly or is an obvious copy/counterfeit
+  MEDIUM — implements the same concept with minor differences
+  LOW    — partial overlap or functional similarity worth monitoring
 
-If no potential infringement is found on this site, return: {"matches": []}`;
+Err on the side of inclusion — if you are unsure, flag it as LOW rather than omitting it.
+If after completing all mandatory steps you find genuinely nothing related, return: {"matches": []}`;
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
@@ -134,7 +145,7 @@ export async function runScan(scanId, assetData) {
 
     updateScan(scanId, { status: "scanning", progressPercent: 5 });
     addLog(scanId, "INFO", `Investigation initialised — ${assetType.toUpperCase()}: "${assetName}"`);
-    addLog(scanId, "INFO", "Engaging Gemini AI analysis engine…");
+    addLog(scanId, "INFO", "Engaging GPT-4o analysis engine…");
 
     let assetAnalysis;
     try {

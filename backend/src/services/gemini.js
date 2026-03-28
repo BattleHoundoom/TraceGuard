@@ -89,7 +89,7 @@ Return a JSON object with exactly this schema:
 }
 
 Rules:
-- targetSites must have between 6 and 12 entries, ordered by likelihood of infringement (highest first).
+- targetSites must have between 3 and 4 entries, ordered by likelihood of infringement (highest first).
 - Use only real, publicly accessible websites.
 - For PATENT assets, always include at least one patent database (patents.google.com or worldwide.espacenet.com) alongside commercial sites.
 - For TRADEMARK assets, always include at least one domain registrar search page (e.g. https://www.godaddy.com/domainsearch/find?checkAvail=1&tmskey=&domainToCheck=${encodeURIComponent(assetName.toLowerCase().replace(/\s+/g, ""))}) to check for domain squatting.`;

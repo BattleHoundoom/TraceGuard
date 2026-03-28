@@ -6,7 +6,6 @@ import { getScan, type ScanStatus } from "@/lib/api";
 import AppSidebar from "@/components/layout/AppSidebar";
 import AppTopNav from "@/components/layout/AppTopNav";
 import TerminalLog from "@/components/scan/TerminalLog";
-import ScanSidePanel from "@/components/scan/ScanSidePanel";
 import DataStream from "@/components/scan/DataStream";
 import Link from "next/link";
 
@@ -138,7 +137,6 @@ export default function ScanPage() {
         {/* Bento grid */}
         <div className="grid grid-cols-12 gap-6">
           <TerminalLog logs={scan.logs} />
-          <ScanSidePanel nodes={scan.nodes} telemetry={scan.telemetry} />
           <DataStream items={scan.stream} />
         </div>
 

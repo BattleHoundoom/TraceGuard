@@ -24,7 +24,7 @@ export default function TerminalLog({ logs }: TerminalLogProps) {
   }, [logs]);
 
   return (
-    <div className="col-span-8 bg-surface-container-lowest border border-[#524533]/5 relative overflow-hidden flex flex-col h-[500px]">
+    <div className="col-span-12 bg-surface-container-lowest border border-[#524533]/5 relative overflow-hidden flex flex-col h-[500px]">
       {/* Animated scan line */}
       <div className="scan-line" />
 

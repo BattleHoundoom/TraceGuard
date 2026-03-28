@@ -18,12 +18,6 @@ export interface ScanStatus {
   status: "queued" | "scanning" | "paused" | "complete";
   startedAt: string;
   logs: ScanLogEntry[];
-  nodes: NodeStatus[];
-  telemetry: {
-    detectionConfidence: number;
-    visualMatching: number;
-    highPriorityRisk: boolean;
-  };
   stream: StreamItem[];
 }
 
@@ -31,11 +25,6 @@ export interface ScanLogEntry {
   timestamp: string;
   level: "INFO" | "SCAN" | "ALERT" | "DATA";
   message: string;
-}
-
-export interface NodeStatus {
-  region: string;
-  status: "active" | "idle";
 }
 
 export interface StreamItem {

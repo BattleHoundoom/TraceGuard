@@ -6,8 +6,6 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/", icon: "dashboard" },
   { label: "Infringements", href: "/report/8829", icon: "gavel" },
-  { label: "Case Files", href: "/cases", icon: "folder_shared" },
-  { label: "Global Scan", href: "/global", icon: "language" },
   { label: "Settings", href: "/settings", icon: "settings" },
 ];
 
@@ -63,21 +61,6 @@ export default function AppSidebar() {
         </Link>
       </div>
 
-      {/* Footer links */}
-      <div className="mt-auto p-4 border-t border-[#524533]/10">
-        <button className="flex items-center gap-3 p-2 text-[#9f8e78] hover:text-primary transition-colors w-full">
-          <span className="material-symbols-outlined text-sm">help</span>
-          <span className="font-headline text-[10px] font-semibold uppercase tracking-widest">
-            Support
-          </span>
-        </button>
-        <button className="flex items-center gap-3 p-2 text-[#9f8e78] hover:text-primary transition-colors w-full">
-          <span className="material-symbols-outlined text-sm">monitor_heart</span>
-          <span className="font-headline text-[10px] font-semibold uppercase tracking-widest">
-            System Status
-          </span>
-        </button>
-      </div>
     </aside>
   );
 }

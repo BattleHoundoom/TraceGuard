@@ -70,6 +70,10 @@ export interface ExportReportResponse {
   downloadUrl: string;
 }
 
+export async function getStats(): Promise<{ totalScans: number; activeAlerts: number }> {
+  return request<{ totalScans: number; activeAlerts: number }>("/api/stats");
+}
+
 export async function startInvestigation(
   payload: StartInvestigationPayload
 ): Promise<{ scanId: string }> {

@@ -196,6 +196,18 @@ export async function updateInfringement(id, updates) {
   return result.rowCount > 0;
 }
 
+export async function getStats() {
+  const { rows } = await pool.query(`
+    SELECT
+      (SELECT COUNT(*) FROM scans) AS total_scans,
+      (SELECT COUNT(*) FROM infringements WHERE status = 'UNACTIONED') AS active_alerts
+  `);
+  return {
+    totalScans: parseInt(rows[0].total_scans, 10),
+    activeAlerts: parseInt(rows[0].active_alerts, 10),
+  };
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function generateNodes() {

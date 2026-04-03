@@ -65,9 +65,6 @@ export default function InvestigationForm() {
             <h2 className="font-headline text-xl font-medium tracking-tight uppercase">
               New Investigation
             </h2>
-            <span className="text-[10px] font-label text-outline tabular-data uppercase">
-              Reference: TG-88-ALPHA
-            </span>
           </div>
 
           <form className="space-y-8" onSubmit={handleSubmit}>
@@ -208,20 +205,6 @@ export default function InvestigationForm() {
         </div>
       </div>
 
-      {/* Forensic metadata strip */}
-      <div className="flex justify-between items-center px-4 py-3 bg-[#32353c]/20 border border-[#524533]/5">
-        <div className="flex gap-4">
-          <span className="text-[10px] font-label text-outline tabular-data uppercase">
-            Lat: 40.7128° N
-          </span>
-          <span className="text-[10px] font-label text-outline tabular-data uppercase">
-            Lon: 74.0060° W
-          </span>
-        </div>
-        <span className="text-[10px] font-label text-primary tabular-data uppercase">
-          Encryption: AES-256 Active
-        </span>
-      </div>
     </div>
   );
 }

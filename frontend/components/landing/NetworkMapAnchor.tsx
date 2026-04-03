@@ -19,31 +19,18 @@ export default function NetworkMapAnchor() {
 
       {/* Metrics overlay */}
       <div className="absolute bottom-8 left-8">
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col">
-            <span className="text-[9px] font-label font-bold text-primary uppercase tracking-[0.3em]">
-              Network Load
-            </span>
-            <div className="flex gap-1 mt-2 items-end">
-              {[3, 5, 4, 6, 2, 4].map((h, i) => (
-                <div
-                  key={i}
-                  className={`w-1 ${i < 4 ? "bg-primary" : "bg-[#524533]/40"}`}
-                  style={{ height: `${h * 4}px` }}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div className="h-10 w-px bg-[#524533]/30" />
-
-          <div>
-            <span className="text-[9px] font-label font-bold text-outline uppercase tracking-[0.3em]">
-              Active Nodes
-            </span>
-            <span className="block font-headline text-lg tabular-data">
-              2,819
-            </span>
+        <div className="flex flex-col">
+          <span className="text-[9px] font-label font-bold text-primary uppercase tracking-[0.3em]">
+            Network Load
+          </span>
+          <div className="flex gap-1 mt-2 items-end">
+            {[3, 5, 4, 6, 2, 4].map((h, i) => (
+              <div
+                key={i}
+                className={`w-1 ${i < 4 ? "bg-primary" : "bg-[#524533]/40"}`}
+                style={{ height: `${h * 4}px` }}
+              />
+            ))}
           </div>
         </div>
       </div>

@@ -7,6 +7,7 @@ import investigationsRouter from "./routes/investigations.js";
 import scansRouter from "./routes/scans.js";
 import reportsRouter from "./routes/reports.js";
 import infringementsRouter from "./routes/infringements.js";
+import { getStats } from "./store.js";
 
 // ── Validate required env vars ────────────────────────────────────────────────
 
@@ -49,6 +50,14 @@ app.use("/api/investigations", investigationsRouter);
 app.use("/api/scans", scansRouter);
 app.use("/api/reports", reportsRouter);
 app.use("/api/infringements", infringementsRouter);
+
+app.get("/api/stats", async (_req, res, next) => {
+  try {
+    res.json(await getStats());
+  } catch (err) {
+    next(err);
+  }
+});
 
 // Health check
 app.get("/health", (_req, res) =>

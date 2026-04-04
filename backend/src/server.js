@@ -26,20 +26,22 @@ if (missing.length) {
 const app = express();
 const PORT = parseInt(process.env.PORT || "4000", 10);
 
-app.use(
-  cors({
-    origin: (origin, cb) => {
-      const allowed = (process.env.FRONTEND_ORIGIN || "http://localhost:3000")
-        .split(",")
-        .map((o) => o.trim());
-      if (!origin || allowed.includes(origin)) return cb(null, true);
-      cb(new Error(`CORS: origin ${origin} not allowed`));
-    },
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: (origin, cb) => {
+    const allowed = (process.env.FRONTEND_ORIGIN || "http://localhost:3000")
+      .split(",")
+      .map((o) => o.trim());
+    console.log(`[cors] origin=${origin} allowed=${allowed.join(",")}`);
+    if (!origin || allowed.includes(origin)) return cb(null, true);
+    cb(new Error(`CORS: origin ${origin} not allowed`));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
@@ -96,14 +98,18 @@ app.use((err, _req, res, _next) => {
 
 initDb()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`\n  TraceGuard backend   →  http://localhost:${PORT}`);
-      console.log(`  Health check         →  http://localhost:${PORT}/health`);
-      console.log(`  OpenAI model         →  ${process.env.OPENAI_MODEL || "gpt-4o"}`);
-      console.log();
-    });
+    if (process.env.VERCEL !== "1") {
+      app.listen(PORT, () => {
+        console.log(`\n  TraceGuard backend   →  http://localhost:${PORT}`);
+        console.log(`  Health check         →  http://localhost:${PORT}/health`);
+        console.log(`  OpenAI model         →  ${process.env.OPENAI_MODEL || "gpt-4o"}`);
+        console.log();
+      });
+    }
   })
   .catch((err) => {
     console.error("[startup] Database initialisation failed:", err);
     process.exit(1);
   });
+
+export default app;

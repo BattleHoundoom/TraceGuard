@@ -115,10 +115,12 @@ Using the research above as your primary source of truth, return a JSON object w
 
 Rules:
 - targetSites must have between 3 and 4 entries, ordered by likelihood of infringement (highest first). Prioritise sites where the research actually found infringing content.
-- Use only real, publicly accessible websites.
-- For PATENT assets, always include at least one patent database (patents.google.com or worldwide.espacenet.com) alongside commercial sites.
-- For TRADEMARK assets, always include at least one domain registrar search page (e.g. https://www.godaddy.com/domainsearch/find?checkAvail=1&tmskey=&domainToCheck=${encodeURIComponent(assetName.toLowerCase().replace(/\s+/g, ""))}) to check for domain squatting.
-- Do not fabricate findings — if the research found nothing, say so in the description and use generic high-risk platforms for targetSites.`;
+- targetSites must ONLY contain sites where infringing products or content are actively SOLD, DISTRIBUTED, or REGISTERED — not blogs, news articles, informational pages, design directories, how-to guides, or reference sites, even if they mention the asset or its counterfeits. Those are research sources, not scan targets.
+- Choose target sites appropriate to the asset type:
+    - PRODUCT / TRADEMARK (physical goods): e-commerce platforms and online marketplaces only (e.g. amazon.com, ebay.com, aliexpress.com, alibaba.com, dhgate.com, etsy.com, walmart.com, temu.com, wish.com, redbubble.com, taobao.com, independent Shopify stores). For TRADEMARK also add one domain registrar search page (e.g. https://www.godaddy.com/domainsearch/find?checkAvail=1&tmskey=&domainToCheck=${encodeURIComponent(assetName.toLowerCase().replace(/\s+/g, ""))}).
+    - PATENT: patent databases (patents.google.com, worldwide.espacenet.com) plus commercial e-commerce/marketplace sites selling products that may implement the patented technology.
+    - COPYRIGHT (creative works): print-on-demand and image marketplaces (e.g. redbubble.com, society6.com, teepublic.com), stock photo sites (shutterstock.com, gettyimages.com), and social media platforms (instagram.com, pinterest.com, tiktok.com).
+- Do not fabricate findings — if the research found nothing, say so in the description and use generic high-risk platforms appropriate to the asset type for targetSites.`;
 
   const completion = await chatWithRetry([
     {

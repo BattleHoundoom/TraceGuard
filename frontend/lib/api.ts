@@ -20,7 +20,7 @@ export interface ScanStatus {
   assetName: string;
   assetType: AssetType;
   progressPercent: number;
-  status: "queued" | "scanning" | "paused" | "complete";
+  status: "queued" | "scanning" | "paused" | "stopped" | "complete";
   startedAt: string;
   logs: ScanLogEntry[];
   stream: StreamItem[];
@@ -79,7 +79,7 @@ export interface DashboardScan {
   id: string;
   assetName: string;
   assetType: AssetType;
-  status: "queued" | "scanning" | "paused" | "complete";
+  status: "queued" | "scanning" | "paused" | "stopped" | "complete";
   startedAt: string;
   progressPercent: number;
   alertCount: number;
@@ -203,6 +203,10 @@ export async function toggleScanPause(
   await request(`/api/scans/${id}/${paused ? "pause" : "resume"}`, {
     method: "POST",
   });
+}
+
+export async function stopScan(id: string): Promise<void> {
+  await request(`/api/scans/${id}/stop`, { method: "POST" });
 }
 
 export async function getReport(scanId: string): Promise<ReportSummary> {

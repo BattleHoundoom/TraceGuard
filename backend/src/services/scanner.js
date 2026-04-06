@@ -11,6 +11,7 @@ import { randomUUID } from "crypto";
 import { analyzeAsset } from "./gemini.js";
 import { bulkScrapeForInfringement } from "./tinyfish.js";
 import { sendScanCompleteEmail } from "./email.js";
+import { removeController } from "./scanController.js";
 import {
   updateScan,
   addLog,
@@ -144,7 +145,7 @@ If after completing all steps you find nothing that clearly meets the criteria a
 
 // ── Main export ───────────────────────────────────────────────────────────────
 
-export async function runScan(scanId, assetData) {
+export async function runScan(scanId, assetData, controller) {
   const { assetType, assetName, primaryUrl, fileName } = assetData;
 
   try {
@@ -161,6 +162,14 @@ export async function runScan(scanId, assetData) {
       await addLog(scanId, "ALERT", `Asset analysis failed: ${err.message}`);
       await updateScan(scanId, { status: "complete", progressPercent: 100 });
       await createReport(scanId, []);
+      removeController(scanId);
+      return;
+    }
+
+    if (controller?.stopped) {
+      await updateScan(scanId, { status: "stopped", progressPercent: 0 });
+      await addLog(scanId, "INFO", "Scan stopped by user.");
+      removeController(scanId);
       return;
     }
 
@@ -206,7 +215,14 @@ export async function runScan(scanId, assetData) {
 
     // ── Concurrent scrape ────────────────────────────────────────────────────
 
-    const scrapeResults = await bulkScrapeForInfringement(targets);
+    const scrapeResults = await bulkScrapeForInfringement(targets, controller);
+
+    if (controller?.stopped) {
+      await updateScan(scanId, { status: "stopped", progressPercent: 0 });
+      await addLog(scanId, "INFO", "Scan stopped by user.");
+      removeController(scanId);
+      return;
+    }
 
     await updateScan(scanId, { progressPercent: 75 });
     await addLog(scanId, "INFO", `All agents returned. Processing ${scrapeResults.length} site reports…`);
@@ -321,10 +337,13 @@ export async function runScan(scanId, assetData) {
         scanId,
       }).catch((err) => console.error("[scanner] Failed to send email:", err));
     }
+
+    removeController(scanId);
   } catch (err) {
     console.error(`[Scanner] Scan ${scanId} failed:`, err);
     await addLog(scanId, "ALERT", `Fatal scan error: ${err.message}`);
     await updateScan(scanId, { status: "complete", progressPercent: 100 });
     await createReport(scanId, []);
+    removeController(scanId);
   }
 }

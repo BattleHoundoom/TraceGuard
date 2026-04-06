@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createScan, getUserById } from "../store.js";
 import { runScan } from "../services/scanner.js";
+import { createController } from "../services/scanController.js";
 
 const router = Router();
 
@@ -29,8 +30,9 @@ router.post("/", async (req, res) => {
     };
 
     const scanId = await createScan(assetType, assetName.trim(), assetData, req.userId);
+    const controller = createController(scanId);
 
-    runScan(scanId, assetData).catch((err) =>
+    runScan(scanId, assetData, controller).catch((err) =>
       console.error(`[investigations] Background scan ${scanId} crashed:`, err)
     );
 

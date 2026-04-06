@@ -1,23 +1,10 @@
-/**
- * TinyFish browser-automation service — async/poll pattern.
- *
- * Flow per URL:
- *   1. POST /v1/automation/run-async  → { run_id }   (returns immediately)
- *   2. Poll GET /v1/runs/{run_id}     → { status, result }
- *   3. Resolve when status is COMPLETED / FAILED / CANCELLED
- *
- * For bulk scraping we submit ALL jobs first, then poll them all in parallel,
- * so total wall-clock time ≈ slowest single job (not the sum of all jobs).
- */
-
 const BASE = "https://agent.tinyfish.ai";
 const SUBMIT_ENDPOINT = `${BASE}/v1/automation/run-async`;
 const STATUS_ENDPOINT = (runId) => `${BASE}/v1/runs/${runId}`;
+const CANCEL_ENDPOINT = (runId) => `${BASE}/v1/runs/${runId}/cancel`;
 
 const POLL_INTERVAL_MS = parseInt(process.env.TINYFISH_POLL_INTERVAL || "5000", 10);
-const JOB_TIMEOUT_MS   = parseInt(process.env.TINYFISH_TIMEOUT     || "600000", 10); // 10 min
-
-// ── Submit ────────────────────────────────────────────────────────────────────
+const JOB_TIMEOUT_MS   = parseInt(process.env.TINYFISH_TIMEOUT     || "600000", 10);
 
 async function submitJob(url, goal, browserProfile = "lite") {
   const res = await fetch(SUBMIT_ENDPOINT, {
@@ -39,13 +26,40 @@ async function submitJob(url, goal, browserProfile = "lite") {
   return run_id;
 }
 
-// ── Poll a single run until terminal ─────────────────────────────────────────
+async function cancelRun(runId) {
+  try {
+    await fetch(CANCEL_ENDPOINT(runId), {
+      method: "POST",
+      headers: { "X-API-Key": process.env.TINYFISH_API_KEY },
+    });
+    console.log(`[TinyFish] Cancelled run ${runId}`);
+  } catch (err) {
+    console.warn(`[TinyFish] Failed to cancel run ${runId}:`, err.message);
+  }
+}
 
-async function pollUntilDone(runId, url) {
+async function pollUntilDone(runId, url, controller) {
   const deadline = Date.now() + JOB_TIMEOUT_MS;
 
   while (Date.now() < deadline) {
+    if (controller?.stopped) {
+      await cancelRun(runId);
+      return { url, matches: [], error: "Scan stopped" };
+    }
+
+    await controller?.waitIfPaused();
+
+    if (controller?.stopped) {
+      await cancelRun(runId);
+      return { url, matches: [], error: "Scan stopped" };
+    }
+
     await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+
+    if (controller?.stopped) {
+      await cancelRun(runId);
+      return { url, matches: [], error: "Scan stopped" };
+    }
 
     let data;
     try {
@@ -75,32 +89,22 @@ async function pollUntilDone(runId, url) {
       console.error(`[TinyFish] Run ${runId} ${status}: ${error ?? ""}`);
       return { url, matches: [], error: `Run ${status.toLowerCase()}${error ? ": " + error : ""}` };
     }
-
-    // PENDING or RUNNING — keep polling
   }
 
   console.error(`[TinyFish] Run ${runId} timed out after ${JOB_TIMEOUT_MS / 1000}s`);
   return { url, matches: [], error: "Timed out" };
 }
 
-// ── Public API ────────────────────────────────────────────────────────────────
-
-/**
- * Scrape multiple URLs concurrently using run-async + parallel polling.
- *
- * All jobs are submitted first (returns immediately), then polled in parallel,
- * so total time ≈ max(individual run times) rather than the sum.
- *
- * @param {Array<{ url: string, goal: string }>} targets
- * @returns {Promise<Array<{ url: string, matches: object[], error?: string }>>}
- */
-export async function bulkScrapeForInfringement(targets) {
-  // Step 1: Submit all jobs simultaneously
+export async function bulkScrapeForInfringement(targets, controller) {
   const submissions = await Promise.all(
     targets.map(async ({ url, goal }) => {
+      if (controller?.stopped) {
+        return { url, runId: null, error: "Scan stopped" };
+      }
       try {
         const runId = await submitJob(url, goal);
         console.log(`[TinyFish] Submitted ${url} → run_id ${runId}`);
+        controller?.runIds.add(runId);
         return { url, runId };
       } catch (err) {
         console.error(`[TinyFish] Failed to submit ${url}:`, err.message);
@@ -109,11 +113,10 @@ export async function bulkScrapeForInfringement(targets) {
     })
   );
 
-  // Step 2: Poll all submitted jobs in parallel
   const results = await Promise.all(
     submissions.map(({ url, runId, error }) => {
       if (!runId) return Promise.resolve({ url, matches: [], error });
-      return pollUntilDone(runId, url);
+      return pollUntilDone(runId, url, controller);
     })
   );
 

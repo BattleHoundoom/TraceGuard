@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { getScan, updateScan } from "../store.js";
+import { getController } from "../services/scanController.js";
 
 const router = Router();
 
@@ -19,6 +20,11 @@ router.post("/:id/pause", async (req, res) => {
   if (scan.status !== "scanning") {
     return res.status(409).json({ error: "Scan is not currently running" });
   }
+
+  const controller = getController(req.params.id);
+  if (!controller) return res.status(409).json({ error: "Scan is not active" });
+
+  controller.pause();
   await updateScan(req.params.id, { status: "paused" });
   res.status(204).send();
 });
@@ -29,7 +35,27 @@ router.post("/:id/resume", async (req, res) => {
   if (scan.status !== "paused") {
     return res.status(409).json({ error: "Scan is not currently paused" });
   }
+
+  const controller = getController(req.params.id);
+  if (!controller) return res.status(409).json({ error: "Scan is not active" });
+
+  controller.resume();
   await updateScan(req.params.id, { status: "scanning" });
+  res.status(204).send();
+});
+
+router.post("/:id/stop", async (req, res) => {
+  const scan = await getScan(req.params.id, req.userId);
+  if (!scan) return res.status(404).json({ error: "Scan not found" });
+  if (scan.status !== "scanning" && scan.status !== "paused") {
+    return res.status(409).json({ error: "Scan is not in progress" });
+  }
+
+  const controller = getController(req.params.id);
+  if (!controller) return res.status(409).json({ error: "Scan is not active" });
+
+  controller.stop();
+  await updateScan(req.params.id, { status: "stopped" });
   res.status(204).send();
 });
 

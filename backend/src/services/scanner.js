@@ -123,7 +123,7 @@ Return your findings as a JSON object with ONLY this structure (no markdown, no 
       "risk_level": "HIGH",
       "similarity_score": "HIGH",
       "match_percent": 92,
-      "contact_email": "any contact or seller email address visible on this specific page — null if none is visible"
+      "contact_email": "email address of the individual responsible party (seller, creator, developer, account owner) — null if none is visible, or if the only email found belongs to the hosting platform or site operator rather than the specific person or entity behind this listing/page/account"
     }
   ]
 }

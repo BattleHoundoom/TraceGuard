@@ -121,6 +121,13 @@ export default function LoginPage() {
                   ) : null}
                   SEND CODE
                 </button>
+
+                <p className="text-[9px] font-label text-outline/50 text-center tracking-widest uppercase leading-relaxed">
+                  By continuing, you agree to our{" "}
+                  <a href="/privacy" className="underline hover:text-outline transition-colors">
+                    Privacy Policy
+                  </a>
+                </p>
               </form>
             ) : (
               <form onSubmit={handleVerifyOtp} className="space-y-6">

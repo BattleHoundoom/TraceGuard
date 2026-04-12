@@ -1,5 +1,14 @@
 import nodemailer from "nodemailer";
 
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT ?? 587),
@@ -61,11 +70,11 @@ export async function sendScanCompleteEmail(to, { assetName, assetType, infringe
         <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
           <tr>
             <td style="color:#9f8e78;padding:6px 0;text-transform:uppercase;font-size:11px">Asset</td>
-            <td style="padding:6px 0">${assetName}</td>
+            <td style="padding:6px 0">${escapeHtml(assetName)}</td>
           </tr>
           <tr>
             <td style="color:#9f8e78;padding:6px 0;text-transform:uppercase;font-size:11px">Type</td>
-            <td style="padding:6px 0">${assetType.toUpperCase()}</td>
+            <td style="padding:6px 0">${escapeHtml(assetType.toUpperCase())}</td>
           </tr>
           <tr>
             <td style="color:#9f8e78;padding:6px 0;text-transform:uppercase;font-size:11px">Infringements</td>

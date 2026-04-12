@@ -290,7 +290,9 @@ export async function verifyAndConsumeOtp(email, otp) {
     return false;
   }
   const hash = createHash("sha256").update(otp + salt).digest("hex");
-  if (hash !== hashed_otp) return false;
+  const a = Buffer.from(hash);
+  const b = Buffer.from(hashed_otp);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return false;
   await pool.query("DELETE FROM otps WHERE email = $1", [email]);
   return true;
 }

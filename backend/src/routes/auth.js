@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { rateLimit } from "express-rate-limit";
 import jwt from "jsonwebtoken";
 import {
   getUserByEmail,
@@ -13,8 +14,18 @@ import {
 } from "../store.js";
 import { sendOtpEmail } from "../services/email.js";
 import { requireAuth } from "../middleware/auth.js";
+import { randomInt } from "crypto";
 
 const router = Router();
+
+const otpVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  keyGenerator: (req) => (req.body?.email ?? req.ip).toLowerCase(),
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many attempts. Please request a new code." },
+});
 
 const REFRESH_COOKIE = "tg_refresh";
 const IS_PROD = process.env.NODE_ENV === "production";
@@ -42,7 +53,7 @@ router.post("/request-otp", async (req, res) => {
       return res.status(429).json({ error: "Please wait before requesting another code" });
     }
 
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const otp = String(randomInt(100000, 1000000));
     await upsertOtp(email, otp);
     await sendOtpEmail(email, otp);
 
@@ -53,7 +64,7 @@ router.post("/request-otp", async (req, res) => {
   }
 });
 
-router.post("/verify-otp", async (req, res) => {
+router.post("/verify-otp", otpVerifyLimiter, async (req, res) => {
   try {
     const email = req.body?.email?.trim()?.toLowerCase();
     const otp = String(req.body?.otp ?? "").trim();

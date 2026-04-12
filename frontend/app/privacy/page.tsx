@@ -21,7 +21,7 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="text-[10px] font-label text-outline uppercase tracking-widest">
-            Effective date: April 12, 2025
+            Effective date: April 12, 2026
           </p>
         </div>
 
@@ -94,7 +94,36 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-[11px] font-headline font-bold text-[#ffb000] uppercase tracking-widest mb-3">
-              4. Third-Party Services
+              4. Cookies and Local Storage
+            </h2>
+            <p className="mb-4">
+              TraceGuard uses only the cookies and browser storage necessary for the service to function.
+              We do not use advertising cookies, cross-site tracking, or analytics cookies.
+            </p>
+            <div className="space-y-4">
+              <div>
+                <p className="font-medium text-on-surface mb-1">Authentication</p>
+                <p>
+                  When you log in via OTP, we set a session cookie to keep you authenticated. This
+                  cookie expires when your session ends or when you log out. It contains no personally
+                  identifiable information beyond an opaque session token.
+                </p>
+              </div>
+              <div>
+                <p className="font-medium text-on-surface mb-1">No third-party tracking</p>
+                <p>
+                  We do not embed any third-party advertising pixels, social media tracking scripts,
+                  or behavioural analytics tools. Vercel, our hosting provider, may collect aggregate
+                  request-level data (such as response times and error rates) for infrastructure
+                  monitoring purposes. This data is not linked to your identity.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <h2 className="text-[11px] font-headline font-bold text-[#ffb000] uppercase tracking-widest mb-3">
+              5. Third-Party Services
             </h2>
             <p className="mb-4">
               TraceGuard relies on the following third-party services to operate. Your data may be
@@ -130,7 +159,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-[11px] font-headline font-bold text-[#ffb000] uppercase tracking-widest mb-3">
-              5. Web Scraping
+              6. Web Scraping
             </h2>
             <p>
               When you initiate a scan, TraceGuard programmatically accesses third-party websites on
@@ -143,7 +172,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-[11px] font-headline font-bold text-[#ffb000] uppercase tracking-widest mb-3">
-              6. Data Retention
+              7. Data Retention
             </h2>
             <div className="space-y-3">
               <p>
@@ -152,8 +181,10 @@ export default function PrivacyPage() {
               </p>
               <p>
                 <span className="font-medium text-on-surface">Deleted accounts</span>: if you request
-                account deletion, your data is retained in an inactive state and will not be actively
-                used. We will contact you for explicit permission before using it for any purpose.
+                account deletion, your account is deactivated and your data is retained in an inactive
+                state. It will not be actively accessed or used. We will seek your explicit permission
+                before using it for any purpose. We do not currently commit to a fixed purge timeline,
+                and we are transparent about that.
               </p>
               <p>
                 <span className="font-medium text-on-surface">Server logs</span> are automatically and
@@ -164,7 +195,19 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-[11px] font-headline font-bold text-[#ffb000] uppercase tracking-widest mb-3">
-              7. Your Rights
+              8. Security
+            </h2>
+            <p>
+              We use HTTPS for all data in transit. Access to stored data is restricted to
+              authenticated application processes. No passwords are stored — authentication is
+              handled entirely via one-time codes sent to your email. While we take reasonable
+              precautions, no system is completely secure and we cannot guarantee absolute security.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-[11px] font-headline font-bold text-[#ffb000] uppercase tracking-widest mb-3">
+              9. Your Rights
             </h2>
             <p className="mb-3">You have the right to:</p>
             <ul className="space-y-2 list-none">
@@ -180,14 +223,14 @@ export default function PrivacyPage() {
               ))}
             </ul>
             <p className="mt-4">
-              To exercise any of these rights, contact us at the address in Section 10. We do not
+              To exercise any of these rights, contact us at the address in Section 11. We do not
               sell your personal data.
             </p>
           </section>
 
           <section>
             <h2 className="text-[11px] font-headline font-bold text-[#ffb000] uppercase tracking-widest mb-3">
-              8. Children's Privacy
+              10. Children's Privacy
             </h2>
             <p>
               TraceGuard is not directed at children under the age of 13. We do not knowingly
@@ -198,7 +241,7 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-[11px] font-headline font-bold text-[#ffb000] uppercase tracking-widest mb-3">
-              9. Changes to This Policy
+              11. Changes to This Policy
             </h2>
             <p>
               We may update this Privacy Policy from time to time. When we do, we will revise the
@@ -210,11 +253,11 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-[11px] font-headline font-bold text-[#ffb000] uppercase tracking-widest mb-3">
-              10. Contact
+              12. Contact
             </h2>
             <p>
               For privacy-related questions, requests, or concerns, contact us at:{" "}
-              <span className="text-[#ffb000]">[your-email@example.com]</span>
+              <span className="text-[#ffb000]">karthiksankar278@gmail.com</span>
             </p>
           </section>
 
